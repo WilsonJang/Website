@@ -5,8 +5,8 @@ const ctx = canvas.getContext("2d");
 let x = canvas.width / 2;
 let y = canvas.height - 30;
 
-let dx = 2;
-let dy = -2;
+let dx = 3;
+let dy = -3;
 
 const ballRadius = 10;
 
@@ -28,25 +28,31 @@ let brickOffsetLeft = 30;
 let score = 0;
 let lives = 3;
 
-let running=false;
+let bricksleft = 0;
+let running = false;
 
 let bricks = [];
 for (let c = 0; c < brickColumnCount; c++) {
     bricks[c] = [];
     for (let r = 0; r < brickRowCount; r++) {
-        bricks[c][r] = { x: 0, y: 0, status: 1 };
+        if (r % 2 == 0) {
+            bricks[c][r] = { x: 0, y: 0, status: 2 };
+            bricksleft++
+        } else {
+            bricks[c][r] = { x: 0, y: 0, status: 1 };
+            bricksleft++
+        }
     }
 }
-
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
 
-document.getElementById("button").onclick= function() {
-    if (!running){
-    running=true;
-    draw()
-}
+document.getElementById("button").onclick = function () {
+    if (!running) {
+        running = true;
+        draw()
+    }
 }
 
 function keyDownHandler(e) {
@@ -68,8 +74,8 @@ function keyUpHandler(e) {
 }
 function mouseMoveHandler(e) {
     var relativeX = e.clientX - canvas.offsetLeft;
-    if(relativeX > 0 && relativeX < canvas.width) {
-        paddleX = relativeX - paddleWidth/2;
+    if (relativeX > 0 && relativeX < canvas.width) {
+        paddleX = relativeX - paddleWidth / 2;
     }
 }
 
@@ -92,26 +98,26 @@ function draw() {
     if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) { //wall collision
         dx = -dx;
     }
-    if (y + dy < ballRadius) { 
+    if (y + dy < ballRadius) {
         dy = -dy;
     } else if (y + dy > canvas.height - ballRadius) { //floor collision
-        if (x> paddleX && x < paddleX + paddleWidth) {//paddle collision
+        if (x > paddleX && x < paddleX + paddleWidth) {//paddle collision
             dy = -dy;
         }
         else {
             lives--;
-            if(!lives){
-            alert("Game Over");
-            document.location.reload();
+            if (!lives) {
+                alert("Game Over");
+                document.location.reload();
             }
-            else{
-                x = canvas.width/2;
-                y = canvas.height-30;
-                dx = 2;
-                dy = -2;
-                paddleX = (canvas.width-paddleWidth)/2;
+            else {
+                x = canvas.width / 2;
+                y = canvas.height - 30;
+                dx = 3;
+                dy = -3;
+                paddleX = (canvas.width - paddleWidth) / 2;
             }
-            
+
         }
     }
     if (rightPressed) {
@@ -141,14 +147,19 @@ function drawPaddle() {
 function drawBricks() {
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowCount; r++) {
-            if (bricks[c][r].status == 1) {
+            if (bricks[c][r].status > 0) {
                 let brickX = (c * (brickWidth + brickPadding)) + brickOffsetLeft;
                 let brickY = (r * (brickHeight + brickPadding)) + brickOffsetTop;
                 bricks[c][r].x = brickX;
                 bricks[c][r].y = brickY;
                 ctx.beginPath();
                 ctx.rect(brickX, brickY, brickWidth, brickHeight);
-                ctx.fillStyle = "#0095DD";
+                
+                if (bricks[c][r].status==1){
+                    ctx.fillStyle = "#0095DD";
+                }else {
+                    ctx.fillStyle = "#ff0000";
+                }
                 ctx.fill();
                 ctx.closePath();
             }
@@ -163,18 +174,21 @@ function drawScore() {
 function drawLives() {
     ctx.font = "16px Arial";
     ctx.fillStyle = "#0095DD";
-    ctx.fillText("Lives: "+lives, canvas.width-65, 20);
+    ctx.fillText("Lives: " + lives, canvas.width - 65, 20);
 }
 function collisionDetection() {
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowCount; r++) {
             let b = bricks[c][r];
-            if (b.status == 1) {
+            if (b.status > 0) {
                 if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
                     dy = -dy;
-                    b.status = 0;
+                    b.status--;
                     score++;
-                    if (score == brickRowCount * brickColumnCount) {
+                    if (b.status ==0){
+                        bricksleft--
+                    }
+                    if (bricksleft==0) {
                         alert("WINNER WINNER CHICKEN DINNER");
                         document.location.reload();
                     }
