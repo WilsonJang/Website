@@ -52,6 +52,7 @@ document.getElementById("button").onclick = function () {
     if (!running) {
         running = true;
         draw()
+        canvas.focus()
     }
 }
 
