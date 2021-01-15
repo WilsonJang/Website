@@ -190,11 +190,46 @@ function collisionDetection() {
                         bricksleft--
                     }
                     if (bricksleft==0) {
-                        alert("WINNER WINNER CHICKEN DINNER");
-                        document.location.reload();
+                        const name = prompt("WINNER WINNER CHICKEN DINNER", "unknown")
+                        saveGame(name)
+                        
                     }
                 }
             }
         }
     }
+}
+
+const request = new XMLHttpRequest();
+request.open('GET', 'http://localhost:3000/scores')
+request.send();
+request.onload = () => {
+    console.log(request);
+    if (request.status == 200) {
+        console.log(JSON.parse(request.response));
+        const data = (JSON.parse(request.response));
+        let html=" ";
+        for (let i=0;i<data.length;i++){
+            html += "<li>" + data[i].PersonName + "  |  " + data[i].Score + "</li>";
+
+        }
+        document.getElementById('brickscore').innerHTML=html;
+    } else {
+        console.log(`error ${request.status} ${request.statusText}`);
+    }
+}
+function saveGame(name) {
+    const data = {
+        name,
+        score
+    };
+    const json = JSON.stringify(data);
+
+const xhr = new XMLHttpRequest();
+xhr.open('POST', 'http://localhost:3000/save');
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.send(json);
+xhr.onload=()=>{
+    document.location.reload();
+}
 }

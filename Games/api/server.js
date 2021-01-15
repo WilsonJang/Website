@@ -1,7 +1,13 @@
 const express = require('express');
 const mariadb = require('mariadb');
-const app = express()
+const cors = require('cors');
 require('dotenv').config()
+const app = express()
+const bodyParser = require('body-parser');
+
+app.use(cors())
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 const port = process.env.PORT;
 
@@ -22,22 +28,22 @@ app.get('/scores', (req, res) => {
         conn.query("SELECT * FROM brick_users").then((rows) => {
             console.log(rows);
             conn.end()
+            res.send(rows);
         }).catch(err => {
             console.log(rows);
-            conn.end
+            conn.end()
+            res.send(err)
         })
 
     }).catch(err => {
         console.log(err)
+        res.send(err)
     })
-    res.send('done');
 });
 
 app.post('/save', (req, res) => {
     pool.getConnection().then(conn => {
-        let name="Ashazi"
-        let score=1000
-        conn.query("INSERT INTO brick_users (PersonName,Score) VALUES ('" + name + "', " + score + ")").then(() => {
+        conn.query("INSERT INTO brick_users (PersonName,Score) VALUES ('" + req.body.name + "', " + req.body.score + ")").then(() => {
             console.log('saved');
             conn.end();
         }).catch(err => {

@@ -17,7 +17,15 @@
 			position: relative;
 			
 		  }
-		  
+		 
+		  .centerscore {
+			margin: 0;
+			position: absolute;
+			top: 25%;
+			left: 75%;
+			-ms-transform: translate(-50%, -50%);
+			transform: translate(-50%, -50%);
+		  }		  
 .center {
 			margin: 0;
 			position: absolute;
